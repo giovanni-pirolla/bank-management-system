@@ -71,53 +71,64 @@ Usuário criado com sucesso! Seu ID é: {user_id}
     limpar_tela()
     
 def realizar_login():
-    try:
-        df_users = pd.read_csv('usuarios.csv', sep=';')
-        
-        user_id = int(input('Digite o seu ID: '))
-        senha = str(input('Digite sua senha: '))
-                
-        usuario_valido = df_users[(df_users['id_usuario'] == user_id) & (df_users['Senha'].astype(str) == str(senha))]
-        
-        if not usuario_valido.empty:
-            dados = usuario_valido.iloc[0]
-            nome = dados['Nome']
-            cargo = dados['Cargo']
-            saldo = dados['Saldo']
+    df_users = pd.read_csv('usuarios.csv', sep=';')
+    
+    if not df_users.empty:
+        try:    
+            user_id = int(input('Digite o seu ID: '))
+            senha = str(input('Digite sua senha: '))
+                    
+            usuario_valido = df_users[(df_users['id_usuario'] == user_id) & (df_users['Senha'].astype(str) == str(senha))]
             
-            if cargo == 'adm':
-                print(f'''
-===============================================================================
-Acesso de {nome} como Administrador efetuado com sucesso!
-===============================================================================
-''')
-                time.sleep(2.5)
+            if not usuario_valido.empty:
+                dados = usuario_valido.iloc[0]
+                nome = dados['Nome']
+                cargo = dados['Cargo']
+                saldo = dados['Saldo']
+                
+                if cargo == 'adm':
+                    print(f'''
+    ===============================================================================
+    Acesso de {nome} como Administrador efetuado com sucesso!
+    ===============================================================================
+    ''')
+                    time.sleep(2.5)
+                    limpar_tela()
+                    return adm(nome, user_id, cargo, saldo)
+                elif cargo == 'operador':
+                    print(f'''
+    ===============================================================================
+    Acesso de {nome} como Operador efetuado com sucesso!
+    ===============================================================================
+    ''')
+                    time.sleep(2.5)
+                    limpar_tela()
+                    return operador(nome, user_id, cargo, saldo)
+            else:
+                print('''
+    =============================================
+    Acesso negado! Usuário e/ou senha inválido(s)
+    =============================================
+    ''')
+                time.sleep(2)
                 limpar_tela()
-                return adm(nome, user_id, cargo, saldo)
-            elif cargo == 'operador':
-                print(f'''
-===============================================================================
-Acesso de {nome} como Operador efetuado com sucesso!
-===============================================================================
-''')
-                time.sleep(2.5)
-                limpar_tela()
-                return operador(nome, user_id, cargo, saldo)
-        else:
+        except ValueError:
             print('''
-=============================================
-Acesso negado! Usuário e/ou senha inválido(s)
-=============================================
-''')
+    ========================================
+    ID de usuário inválido. Tente novamente.
+    ========================================
+    ''')
             time.sleep(2)
             limpar_tela()
-    except ValueError:
+    
+    else:
         print('''
-========================================
-ID de usuário inválido. Tente novamente.
-========================================
-''')
-        time.sleep(4)
+=====================================
+Nenhum usuário cadastrado no sistema.
+Por favor, crie uma conta primeiro.
+=====================================       
+              ''')
+        time.sleep(3)
         limpar_tela()
 
 while True:
@@ -138,8 +149,8 @@ Sair do programa [0]
     elif escolha == 2:
         usuario_logado = realizar_login()
         
-        while True:
-            if usuario_logado:
+        if usuario_logado:
+            while True:
                 print(f'''
 =============================================================================================================                   
 SEJA BEM VINDO(A) {usuario_logado._nome.upper()}! Quais os seus planos para hoje?
